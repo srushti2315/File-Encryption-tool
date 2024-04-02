@@ -18,14 +18,15 @@ from tkinter import ttk
 
 class FileEncryptionTool:
     # noinspection PyUnresolvedReferences
+   
     def __init__(self, root):
         self.encrypted_file_path = None
         self.root = root
         self.file_path = None
         self.root.title("File Encryption Tool")
-        ctk.set_default_color_theme("MoonlitSky.json")
+        # ctk.set_default_color_theme("MoonlitSky.json")
 
-        self.main_frame = ctk.CTkFrame(self.root)
+        self.main_frame = ctk.CTkFrame(self.root, bg_color="#121212")
         self.main_frame.pack(expand=True, fill='both')
 
         # Navbar
@@ -135,18 +136,19 @@ class FileEncryptionTool:
         encrypted_file_data = self.cursor.fetchone()
 
         if encrypted_file_data:
-            # Display the encrypted file path in the receiver's tab
+       
+            encrypted_file_name = encrypted_file_data[0] + '.encrypted'  # Add the .encrypted extension
+            encrypted_file_path = os.path.join('encrypted_files', encrypted_file_name)
 
-            encrypted_data_entry = ctk.CTkEntry(self.receiver_tab, width=50)
-            encrypted_data_entry.configure(text=f"selected File: {self.file_path}")
-            encrypted_data_entry.pack(pady=10)
+            encrypted_path_label = ctk.CTkLabel(self.receiver_tab, width=50)
+            encrypted_path_label.configure(text=f"Encrypted File Path: {encrypted_file_path}")
+            encrypted_path_label.pack(pady=10)
 
+       
+            self.encrypted_file_path = encrypted_file_path
 
-            messagebox.showinfo("Success", "File send to Receiver successfully!")
+            messagebox.showinfo("Success", "File sent to Receiver successfully!")
 
-            decrypt_button = tk.Button(self.receiver_tab, text="Decrypt File",
-                                   command=self.decrypt_file)  
-            decrypt_button.pack(pady=10)
         else:
             messagebox.showerror("Error", "No encrypted file found in the database.")
 
@@ -157,9 +159,8 @@ class FileEncryptionTool:
                 encrypt_data = self.fernet.encrypt(file_data)
 
                 file_name = self.file_path.split('/')[-1]
-                encrypted_file_name = file_name + '.encrypted'  # Append extension to indicate encryption
+                encrypted_file_name = file_name + '.encrypted'  
 
-                # Create the encrypted_files directory if it doesn't exist
                 encrypted_files_dir = 'encrypted_files'
                 if not os.path.exists(encrypted_files_dir):
                     os.makedirs(encrypted_files_dir)
@@ -179,7 +180,7 @@ class FileEncryptionTool:
 
 
     def decrypt_file(self):
-        encrypted_file_path = self.encrypted_file_path.get()
+        encrypted_file_path = self.encrypted_file_path
 
         if encrypted_file_path:
             try:
@@ -187,12 +188,22 @@ class FileEncryptionTool:
                     file_data = file.read()
                     decrypt_data = self.fernet.decrypt(file_data)
 
-                    original_file_name = encrypted_file_path.split('/')[-1]
-                    decrypted_file_name = original_file_name[:-10]
+                
+                    file_name = os.path.splitext(os.path.basename(encrypted_file_path))[0]
 
-                    with open(decrypted_file_name, 'wb') as decrypted_file:
-                        decrypted_file.write(decrypt_data)
-                    messagebox.showinfo("Success", "File decrypted and saved successfully!")
+                
+                    decrypted_files_dir = 'decrypted_files'
+                    if not os.path.exists(decrypted_files_dir):
+                        os.makedirs(decrypted_files_dir)
+
+               
+                    decrypted_file_path = os.path.join(decrypted_files_dir, file_name)
+
+                # Save the decrypted data to a file
+                with open(decrypted_file_path, 'wb') as decrypted_file:
+                    decrypted_file.write(decrypt_data)
+
+                messagebox.showinfo("Success", "File decrypted and saved successfully!")
             except InvalidToken:
                 messagebox.showerror("Error", "Invalid or corrupted data. Failed to decrypt file.")
             except Exception as e:
