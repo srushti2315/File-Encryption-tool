@@ -3,14 +3,13 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog, messagebox, Menu
 
-import self
 from cryptography import fernet
 from cryptography.fernet import Fernet
 import sqlite3
 from cryptography.fernet import InvalidToken
 from tkinter import ttk
 # from moviepy.editor import VideoFileClip
-from PIL import Image, ImageTk
+# from PIL import Image, ImageTk
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences
@@ -25,13 +24,14 @@ class FileEncryptionTool:
 
         self.main_frame = ctk.CTkFrame(self.root)
         self.main_frame.pack(expand=True, fill='both')
-
+        
+        heading_label = ctk.CTkLabel(self.main_frame, text="Welcome to File Encryption Tool",font=('Helvetica', 24))
+        heading_label.pack(pady=10)
         # Navbar
         self.create_navbar()
 
         # Heading
-        heading_label = ctk.CTkLabel(self.main_frame, text="Welcome to File Encryption Tool",font=('Helvetica', 24))
-        heading_label.pack(pady=10)
+        
 
         self.tab_control = ttk.Notebook(self.main_frame)
         self.tab_control.pack(expand=True, fill='both')
