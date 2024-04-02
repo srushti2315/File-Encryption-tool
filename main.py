@@ -24,14 +24,13 @@ class FileEncryptionTool:
 
         self.main_frame = ctk.CTkFrame(self.root)
         self.main_frame.pack(expand=True, fill='both')
-        
-        heading_label = ctk.CTkLabel(self.main_frame, text="Welcome to File Encryption Tool",font=('Helvetica', 24))
-        heading_label.pack(pady=10)
+
         # Navbar
         self.create_navbar()
 
         # Heading
-        
+        heading_label = ctk.CTkLabel(self.main_frame, text="Welcome to File Encryption Tool",font=('Helvetica', 24))
+        heading_label.pack(pady=10)
 
         self.tab_control = ttk.Notebook(self.main_frame)
         self.tab_control.pack(expand=True, fill='both')
@@ -158,15 +157,20 @@ class FileEncryptionTool:
             with open(self.file_path, 'rb') as file:
                 file_data = file.read()
                 encrypt_data = self.fernet.encrypt(file_data)
+
                 file_name = self.file_path.split('/')[-1]
+                encrypted_file_name = file_name + '.encrypted'  # Append extension to indicate encryption
+                with open(encrypted_file_name, 'wb') as encrypted_file:
+                    encrypted_file.write(encrypt_data)
+
+                # Inserting into the database
                 self.cursor.execute('''INSERT INTO encrypted_files (file_name, encrypt_data)
                                     VALUES (?, ?)''', (file_name, encrypt_data))
                 self.conn.commit()
-                # self.label.configure(text="File encrypted and saved!")
                 messagebox.showinfo("Success", "File encrypted and saved successfully!")
 
-            with open('encrypted_file.dat', 'wb') as encrypted_file:
-                encrypted_file.write(encrypt_data)
+            # with open('encrypted_file.dat', 'wb') as encrypted_file:
+            #     encrypted_file.write(encrypt_data)
         else:
             # self.label.configure(text="No file selected!")
             messagebox.showerror("Error", f"Failed to encrypt file: {str(e)}")
@@ -178,11 +182,11 @@ class FileEncryptionTool:
                 try:
                     decrypt_data = self.fernet.decrypt(file_data)
 
-                    file_name = self.file_path.split('/')[-1]
-                    self.cursor.execute('''INSERT INTO decrypted_files (file_name, decrypt_data)
-                                        VALUES (?, ?)''', (file_name, decrypt_data))
-                    self.conn.commit()
-                    # self.label.configure(text="File decrypted and saved!")
+                    original_file_name = self.file_path.split('/')[-1]
+                    decrypted_file_name = original_file_name[:-10]
+
+                    with open(decrypted_file_name, 'wb') as decrypted_file:
+                        decrypted_file.write(decrypt_data)
                     messagebox.showinfo("Success", "File decrypted and saved successfully!")
 
                 # except InvalidToken:
