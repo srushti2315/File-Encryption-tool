@@ -2,6 +2,8 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog, messagebox, Menu
+import os
+
 
 from cryptography import fernet
 from cryptography.fernet import Fernet
@@ -13,6 +15,7 @@ from tkinter import ttk
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences
+
 class FileEncryptionTool:
     # noinspection PyUnresolvedReferences
     def __init__(self, root):
@@ -121,33 +124,28 @@ class FileEncryptionTool:
         send_button.pack(pady=10)
 
     def create_receiver_tab(self):
-        self.encrypted_file_path = tk.StringVar()
-        encrypted_file_entry = tk.Entry(self.receiver_tab, textvariable=self.encrypted_file_path)
-        encrypted_file_entry.pack(pady=10)
-
+    
         self.decrypt_button = ctk.CTkButton(self.receiver_tab, text="Decrypt", command=self.decrypt_file)
         self.decrypt_button.pack(pady=10)
 
-        # receive_button = tk.Button(self.receiver_tab, text="Receive and Decrypt File",
-        #                            command=self.decrypt_file)
-        # receive_button.pack(pady=10)
 
     def send_encrypted_file(self):
-        # Retrieve encrypted file data from the database
-        self.cursor.execute("SELECT encrypt_data FROM encrypted_files ORDER BY id DESC LIMIT 1")
+    # Retrieve encrypted file data from the database
+        self.cursor.execute("SELECT file_name FROM encrypted_files ORDER BY id DESC LIMIT 1")
         encrypted_file_data = self.cursor.fetchone()
 
         if encrypted_file_data:
-            # Display the encrypted file data in the receiver's tab
-            encrypted_data_label = tk.Label(self.receiver_tab, text="Encrypted File Data:")
-            encrypted_data_label.pack(pady=10)
+            # Display the encrypted file path in the receiver's tab
 
-            encrypted_data_entry = tk.Entry(self.receiver_tab, width=50)
-            encrypted_data_entry.insert(0, encrypted_file_data[0])
+            encrypted_data_entry = ctk.CTkEntry(self.receiver_tab, width=50)
+            encrypted_data_entry.configure(text=f"selected File: {self.file_path}")
             encrypted_data_entry.pack(pady=10)
 
+
+            messagebox.showinfo("Success", "File send to Receiver successfully!")
+
             decrypt_button = tk.Button(self.receiver_tab, text="Decrypt File",
-                                       command=lambda: self.decrypt_file(encrypted_file_data[0]))
+                                   command=self.decrypt_file)  
             decrypt_button.pack(pady=10)
         else:
             messagebox.showerror("Error", "No encrypted file found in the database.")
@@ -160,7 +158,14 @@ class FileEncryptionTool:
 
                 file_name = self.file_path.split('/')[-1]
                 encrypted_file_name = file_name + '.encrypted'  # Append extension to indicate encryption
-                with open(encrypted_file_name, 'wb') as encrypted_file:
+
+                # Create the encrypted_files directory if it doesn't exist
+                encrypted_files_dir = 'encrypted_files'
+                if not os.path.exists(encrypted_files_dir):
+                    os.makedirs(encrypted_files_dir)
+
+                encrypted_file_path = os.path.join(encrypted_files_dir, encrypted_file_name)
+                with open(encrypted_file_path, 'wb') as encrypted_file:
                     encrypted_file.write(encrypt_data)
 
                 # Inserting into the database
@@ -169,45 +174,38 @@ class FileEncryptionTool:
                 self.conn.commit()
                 messagebox.showinfo("Success", "File encrypted and saved successfully!")
 
-            # with open('encrypted_file.dat', 'wb') as encrypted_file:
-            #     encrypted_file.write(encrypt_data)
         else:
-            # self.label.configure(text="No file selected!")
-            messagebox.showerror("Error", f"Failed to encrypt file: {str(e)}")
+            messagebox.showerror("Error", "No file selected!")
+
 
     def decrypt_file(self):
-        if hasattr(self, 'file_path'):
-            with open(self.file_path, 'rb') as file:
-                file_data = file.read()
-                try:
+        encrypted_file_path = self.encrypted_file_path.get()
+
+        if encrypted_file_path:
+            try:
+                with open(encrypted_file_path, 'rb') as file:
+                    file_data = file.read()
                     decrypt_data = self.fernet.decrypt(file_data)
 
-                    original_file_name = self.file_path.split('/')[-1]
+                    original_file_name = encrypted_file_path.split('/')[-1]
                     decrypted_file_name = original_file_name[:-10]
 
                     with open(decrypted_file_name, 'wb') as decrypted_file:
                         decrypted_file.write(decrypt_data)
                     messagebox.showinfo("Success", "File decrypted and saved successfully!")
-
-                # except InvalidToken:
-                #     self.label.configure(text="Error: Unable to decrypt file. Invalid or corrupted data.")
-
-                except InvalidToken:
-                    messagebox.showerror("Error", "Invalid or corrupted data. Failed to decrypt file.")
-                except Exception as e:
-                    messagebox.showerror("Error", f"Failed to decrypt file: {str(e)}")
-
+            except InvalidToken:
+                messagebox.showerror("Error", "Invalid or corrupted data. Failed to decrypt file.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to decrypt file: {str(e)}")
         else:
-            # self.label.configure(text="No file selected!")
-            messagebox.showerror("Error", "No File selected")
+            messagebox.showerror("Error", "No encrypted file path provided.")
+
 
     def choose_file(self):
         self.file_path = filedialog.askopenfilename()
         if self.file_path:
             # self.label.configure(text=f"selected File: {self.file_path}")
             messagebox.showinfo("Success", "File selected successfully!")
-
-
 
 
 if __name__ == "__main__":
@@ -218,3 +216,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
 
         root.destroy()
+
+
+
+
