@@ -11,42 +11,46 @@ import sqlite3
 from cryptography.fernet import InvalidToken
 from tkinter import ttk
 # from moviepy.editor import VideoFileClip
-# from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 
 
 # noinspection PyTypeChecker,PyUnresolvedReferences
 
 class FileEncryptionTool:
     # noinspection PyUnresolvedReferences
-   
     def __init__(self, root):
         self.encrypted_file_path = None
         self.root = root
         self.file_path = None
         self.root.title("File Encryption Tool")
-        # ctk.set_default_color_theme("MoonlitSky.json")
 
-        self.main_frame = ctk.CTkFrame(self.root, bg_color="#121212")
-        self.main_frame.pack(expand=True, fill='both')
+        # Load the background image
+        self.bg_image = Image.open("Safeimagekit-resized-img (1).png")  # Replace "backimage.png" with your image file path
+
+        # Convert the image to a format compatible with tkinter
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+
+        # Create a label widget with the background image
+        self.background_label = tk.Label(root, image=self.bg_photo)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)  # Expand the label to cover the entire root window
+
+        # Create the tab control after the background label
+        self.tab_control = ttk.Notebook(root, width=400, height=300)
+        self.tab_control.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Center the tab control on the root window
 
         # Navbar
         self.create_navbar()
 
         # Heading
-        heading_label = ctk.CTkLabel(self.main_frame, text="Welcome to File Encryption Tool",font=('Helvetica', 24))
+        heading_label = ctk.CTkLabel(self.root, text="Welcome to File Encryption Tool", font=('Helvetica', 24))
         heading_label.pack(pady=10)
 
-        self.tab_control = ttk.Notebook(self.main_frame)
-        self.tab_control.pack(expand=True, fill='both')
-
-        # Sender tab
+        # Add tabs
         self.sender_tab = ctk.CTkFrame(self.tab_control)
         self.tab_control.add(self.sender_tab, text="Sender")
 
-        # Receiver tab
         self.receiver_tab = ctk.CTkFrame(self.tab_control)
         self.tab_control.add(self.receiver_tab, text="Receiver")
-
 
         # Create sender tab
         self.create_sender_tab()
@@ -54,26 +58,19 @@ class FileEncryptionTool:
         # Create receiver tab
         self.create_receiver_tab()
 
-        # Navbar
-        # navbar_frame = ctk.CTkFrame(self.main_frame)
-        # navbar_frame.pack(fill='x')
-        #
-        # heading_label = ctk.CTkLabel(navbar_frame, text="File Encryption Tool", font=('Helvetica', 18))
-        # heading_label.pack(pady=10)
-
-        # self.label = ctk.CTkLabel(root, text="Select a file to encrypt:")
-        # self.label.pack(pady=10)
-
+        # Encryption key
         self.key = Fernet.generate_key()
         self.fernet = Fernet(self.key)
 
+        # Database connection
         self.conn = sqlite3.connect("fileDB.db")
         self.cursor = self.conn.cursor()
         self.create_tables()
 
-        # self.create_buttons()
-
         self.root.geometry("800x600")
+
+    # Remaining methods remain unchanged...
+
 
     def create_tables(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS encrypted_files
