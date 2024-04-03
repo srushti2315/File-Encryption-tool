@@ -25,7 +25,7 @@ class FileEncryptionTool:
         self.root.title("File Encryption Tool")
 
         # Load the background image
-        self.bg_image = Image.open("Safeimagekit-resized-img (1).png")  # Replace "backimage.png" with your image file path
+        self.bg_image = Image.open("Safeimagekit-resized-img (2).png")  # Replace "backimage.png" with your image file path
 
         # Convert the image to a format compatible with tkinter
         self.bg_photo = ImageTk.PhotoImage(self.bg_image)
