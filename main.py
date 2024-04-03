@@ -3,74 +3,50 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog, messagebox, Menu
 import os
-
-
 from cryptography import fernet
 from cryptography.fernet import Fernet
 import sqlite3
 from cryptography.fernet import InvalidToken
 from tkinter import ttk
-# from moviepy.editor import VideoFileClip
 from PIL import Image, ImageTk
 
-
-# noinspection PyTypeChecker,PyUnresolvedReferences
-
 class FileEncryptionTool:
-    # noinspection PyUnresolvedReferences
     def __init__(self, root):
         self.encrypted_file_path = None
         self.root = root
         self.file_path = None
         self.root.title("File Encryption Tool")
 
-        # Load the background image
-        self.bg_image = Image.open("Safeimagekit-resized-img (1).png")  # Replace "backimage.png" with your image file path
+        # self.bg_image = Image.open("Safeimagekit-resized-img (1).png")
+        # self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+        # self.background_label = tk.Label(root, image=self.bg_photo)
+        # self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        # Convert the image to a format compatible with tkinter
-        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-
-        # Create a label widget with the background image
-        self.background_label = tk.Label(root, image=self.bg_photo)
-        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)  # Expand the label to cover the entire root window
-
-        # Create the tab control after the background label
         self.tab_control = ttk.Notebook(root, width=400, height=300)
-        self.tab_control.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Center the tab control on the root window
+        self.tab_control.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        # Navbar
         self.create_navbar()
 
-        # Heading
         heading_label = ctk.CTkLabel(self.root, text="Welcome to File Encryption Tool", font=('Helvetica', 24))
         heading_label.pack(pady=10)
 
-        # Add tabs
         self.sender_tab = ctk.CTkFrame(self.tab_control)
         self.tab_control.add(self.sender_tab, text="Sender")
 
         self.receiver_tab = ctk.CTkFrame(self.tab_control)
         self.tab_control.add(self.receiver_tab, text="Receiver")
 
-        # Create sender tab
         self.create_sender_tab()
-
-        # Create receiver tab
         self.create_receiver_tab()
 
-        # Encryption key
         self.key = Fernet.generate_key()
         self.fernet = Fernet(self.key)
 
-        # Database connection
         self.conn = sqlite3.connect("fileDB.db")
         self.cursor = self.conn.cursor()
         self.create_tables()
 
         self.root.geometry("800x600")
-
-    # Remaining methods remain unchanged...
-
 
     def create_tables(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS encrypted_files
@@ -83,7 +59,6 @@ class FileEncryptionTool:
                                file_name TEXT,
                                decrypt_data BLOB)''')
         self.conn.commit()
-
 
     def create_navbar(self):
         menubar = Menu(self.root)
@@ -110,8 +85,6 @@ class FileEncryptionTool:
         messagebox.showinfo("About", "File Encryption Tool\nVersion 1.0\nDeveloped by Your Name")
 
     def create_sender_tab(self):
-        # select_file_button = tk.Button(self.sender_tab, text="Select File", command=self.encrypt_file)
-        # select_file_button.pack(pady=10)
         file_button = ctk.CTkButton(self.sender_tab, text="Select File", command=self.choose_file)
         file_button.pack(pady=10)
 
@@ -122,30 +95,23 @@ class FileEncryptionTool:
         send_button.pack(pady=10)
 
     def create_receiver_tab(self):
-    
         self.decrypt_button = ctk.CTkButton(self.receiver_tab, text="Decrypt", command=self.decrypt_file)
         self.decrypt_button.pack(pady=10)
 
-
     def send_encrypted_file(self):
-    # Retrieve encrypted file data from the database
         self.cursor.execute("SELECT file_name FROM encrypted_files ORDER BY id DESC LIMIT 1")
         encrypted_file_data = self.cursor.fetchone()
 
         if encrypted_file_data:
-       
-            encrypted_file_name = encrypted_file_data[0] + '.encrypted'  # Add the .encrypted extension
+            encrypted_file_name = encrypted_file_data[0] + '.encrypted'
             encrypted_file_path = os.path.join('encrypted_files', encrypted_file_name)
 
             encrypted_path_label = ctk.CTkLabel(self.receiver_tab, width=50)
             encrypted_path_label.configure(text=f"Encrypted File Path: {encrypted_file_path}")
             encrypted_path_label.pack(pady=10)
 
-       
             self.encrypted_file_path = encrypted_file_path
-
             messagebox.showinfo("Success", "File sent to Receiver successfully!")
-
         else:
             messagebox.showerror("Error", "No encrypted file found in the database.")
 
@@ -156,7 +122,7 @@ class FileEncryptionTool:
                 encrypt_data = self.fernet.encrypt(file_data)
 
                 file_name = self.file_path.split('/')[-1]
-                encrypted_file_name = file_name + '.encrypted'  
+                encrypted_file_name = file_name + '.encrypted'
 
                 encrypted_files_dir = 'encrypted_files'
                 if not os.path.exists(encrypted_files_dir):
@@ -166,15 +132,12 @@ class FileEncryptionTool:
                 with open(encrypted_file_path, 'wb') as encrypted_file:
                     encrypted_file.write(encrypt_data)
 
-                # Inserting into the database
                 self.cursor.execute('''INSERT INTO encrypted_files (file_name, encrypt_data)
                                     VALUES (?, ?)''', (file_name, encrypt_data))
                 self.conn.commit()
                 messagebox.showinfo("Success", "File encrypted and saved successfully!")
-
         else:
             messagebox.showerror("Error", "No file selected!")
-
 
     def decrypt_file(self):
         encrypted_file_path = self.encrypted_file_path
@@ -185,18 +148,14 @@ class FileEncryptionTool:
                     file_data = file.read()
                     decrypt_data = self.fernet.decrypt(file_data)
 
-                
                     file_name = os.path.splitext(os.path.basename(encrypted_file_path))[0]
 
-                
                     decrypted_files_dir = 'decrypted_files'
                     if not os.path.exists(decrypted_files_dir):
                         os.makedirs(decrypted_files_dir)
 
-               
                     decrypted_file_path = os.path.join(decrypted_files_dir, file_name)
 
-                # Save the decrypted data to a file
                 with open(decrypted_file_path, 'wb') as decrypted_file:
                     decrypted_file.write(decrypt_data)
 
@@ -208,13 +167,10 @@ class FileEncryptionTool:
         else:
             messagebox.showerror("Error", "No encrypted file path provided.")
 
-
     def choose_file(self):
         self.file_path = filedialog.askopenfilename()
         if self.file_path:
-            # self.label.configure(text=f"selected File: {self.file_path}")
             messagebox.showinfo("Success", "File selected successfully!")
-
 
 if __name__ == "__main__":
     root = ctk.CTk()
@@ -222,9 +178,4 @@ if __name__ == "__main__":
     try:
         root.mainloop()
     except KeyboardInterrupt:
-
         root.destroy()
-
-
-
-
