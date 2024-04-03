@@ -1,1 +1,0 @@
-tk.set_default_color_theme("MoonlitSky.json")
