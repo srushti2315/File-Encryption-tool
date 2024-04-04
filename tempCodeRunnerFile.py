@@ -1,5 +1,6 @@
-self.bg_frame = Image.open('assets/images/background1.png')
-        photo = ImageTk.PhotoImage(self.bg_frame)
-        self.bg_panel = Label(self.window, image=photo)
-        self.bg_panel.image = photo
-        self.bg_panel.pack(fill='both', expand='yes')
+        tab_width = 800
+        tab_height = 400
+        tab_x = (screen_width - tab_width) / 2
+        tab_y = (screen_height - tab_height) / 2
+        self.tab = customtkinter.CTkTabview(self.main, width=tab_width, height=tab_height, fg_color="green")
+        self.tab.place(x=tab_x, y=tab_y)
