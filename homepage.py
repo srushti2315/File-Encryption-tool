@@ -1,7 +1,7 @@
 import customtkinter
 from customtkinter import *
 from PIL import Image
-import sender1
+import sender
 
 class homepage:
     def __init__(self):
@@ -48,7 +48,7 @@ class homepage:
     
     def sendmail(self):
         self.main.destroy()
-        sender1.sendmail()
+        sender.sendmail()
 
 
 
