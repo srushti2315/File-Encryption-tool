@@ -9,6 +9,7 @@ import sqlite3
 from cryptography.fernet import InvalidToken
 from tkinter import ttk
 from PIL import Image, ImageTk
+import login
 
 class FileEncryptionTool:
     def __init__(self, root):
@@ -173,9 +174,4 @@ class FileEncryptionTool:
             messagebox.showinfo("Success", "File selected successfully!")
 
 if __name__ == "__main__":
-    root = ctk.CTk()
-    app = FileEncryptionTool(root)
-    try:
-        root.mainloop()
-    except KeyboardInterrupt:
-        root.destroy()
+   login.LoginPage()

@@ -3,6 +3,7 @@ from customtkinter import *
 from PIL import Image
 from tkinter import filedialog, messagebox
 import sqlite3
+import homepage
 class LoginPage:
     def __init__(self):
         self.main = CTk()
@@ -47,6 +48,9 @@ class LoginPage:
         user = self.cursor.fetchone()
         if user:
             messagebox.showinfo("Success", "Login successful!")
+            self.main.destroy()
+            homepage.homepage()
+
         else:
             messagebox.showerror("Error", "Invalid username or password.")
     
@@ -54,6 +58,7 @@ class LoginPage:
         username = self.usrname_entry.get()
         password = self.passwd_entry.get()
         self.check_user(username, password)
+        
 
         
 
@@ -99,7 +104,7 @@ class SignUpPage:
         self.conn = sqlite3.connect("loginDB.db")
         self.cursor = self.conn.cursor()
         self.create_table()
-        self.main.geometry("800x500")
+        self.root.geometry("800x500")
         self.root.mainloop()
         
 
