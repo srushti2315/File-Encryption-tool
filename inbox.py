@@ -12,7 +12,8 @@ class InboxApp:
         self.conn = sqlite3.connect("loginDB.db")
         self.cursor = self.conn.cursor()
 
-        
+        self.main.configure(fg_color="#121212")
+
         screen_width = self.main.winfo_screenwidth()
         screen_height = self.main.winfo_screenheight()
 
@@ -29,7 +30,7 @@ class InboxApp:
         self.about_btn.place(relx=0.4, rely=0.5, anchor="center")
         self.contact_btn = CTkButton(self.navbar, text="Contact Us", fg_color="black",height=40,border_width=2,border_color="#39FF14",font=("", 15, "bold"),hover_color="green")
         self.contact_btn.place(relx=0.6, rely=0.5, anchor="center")
-        self.inbox_frame = CTkFrame(self.main,height=600,width=200,fg_color="blue")
+        self.inbox_frame = CTkFrame(self.main,height=600,width=300,fg_color="blue")
         self.inbox_frame.grid(row=2, column=0, sticky="w")
         self.main.grid_columnconfigure(0, weight=1)
 
@@ -39,13 +40,14 @@ class InboxApp:
     def display_inbox(self):
         self.cursor.execute("SELECT senders_name, subject, message, attachment_name  FROM {}".format(self.userinf))
         messages = self.cursor.fetchall()
-
+        a = 0
         for index, message in enumerate(messages, start=1):
-            sender, subject, mes, attachment_name  = message
-            message_label = CTkLabel(self.inbox_frame, text=f"{index}. From: {sender}, Subject: {subject}",height=50,width=300,fg_color="black")
-            message_label.grid(row=index,column=0)
-            self.inbox_frame.grid(row=1, column=0, sticky="w", columnspan=10)
-            self.main.grid_rowconfigure(2, weight=1)
+            sender, subject, mes, attachment_name = message
+            message_label = CTkLabel(self.inbox_frame, text=f"{index}. From: {sender}, Subject: {subject}", height=50, width=300, fg_color="black")
+            message_label.grid(row=a, column=0, sticky="w")
+            a += 1
+
+
 
         
 
