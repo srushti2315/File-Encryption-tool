@@ -84,8 +84,8 @@ class sendmail:
         self.enc,self.attachent_name=self.encrypt_file()
         self.cursor.execute('''INSERT INTO {}
                            (senders_name, subject, message,attachment_name,attachment)
-                           VALUES (?, ?, ?, ?. ?)'''.format(self.userinf), 
-                           (sendersname, subject, text,self.attachent_name,self.enc))
+                           VALUES (?, ?, ?, ?, ?)'''.format(sendersname), 
+                           (self.userinf, subject,text,self.attachent_name,self.enc))
         self.conn.commit()
 
 

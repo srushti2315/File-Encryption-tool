@@ -130,8 +130,8 @@ class SignUpPage:
                                (id INTEGER PRIMARY KEY,
                                senders_name TEXT,
                                subject TEXT,
-                               message TEXT,,
-                               attachment_name TEXT
+                               message TEXT,
+                               attachment_name TEXT,
                                attachment BLOB)'''.format(username))
         self.conn.commit()
         self.root.destroy()
