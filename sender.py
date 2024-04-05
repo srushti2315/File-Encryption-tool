@@ -85,9 +85,9 @@ class sendmail:
         text=self.message_text.get(0.0,'end')
         self.enc,self.attachent_name=self.encrypt_file()
         self.cursor.execute('''INSERT INTO {}
-                           (senders_name, subject, message,attachment_name,attachment)
-                           VALUES (?, ?, ?, ?, ?)'''.format(sendersname), 
-                           (self.userinf, subject,text,self.attachent_name,self.enc))
+                           (senders_name, subject, message,attachment_name,attachment,key)
+                           VALUES (?, ?, ?, ?, ?, ?)'''.format(sendersname), 
+                           (self.userinf, subject,text,self.attachent_name,self.enc,self.key))
         self.conn.commit()
 
 
@@ -99,7 +99,7 @@ class sendmail:
 
                 file_name = self.file_path.split('/')[-1]
                 encrypted_file_name = file_name + '.encrypted'
-            
+                
                 return encrypt_data,encrypted_file_name
         
                 # encrypted_files_dir = 'encrypted_files'

@@ -132,7 +132,8 @@ class SignUpPage:
                                subject TEXT,
                                message TEXT,
                                attachment_name TEXT,
-                               attachment BLOB)'''.format(username))
+                               attachment BLOB,
+                               key TEXT)'''.format(username))
         self.conn.commit()
         self.root.destroy()
         LoginPage()
