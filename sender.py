@@ -9,12 +9,14 @@ import sqlite3
 from cryptography.fernet import InvalidToken
 import sqlite3
 import os
+import inbox
+
 class sendmail:
 
     file_path=None
     file_data=None
-    userinf=None
-    def __init__(self,Userinf="om"):
+    Userinf=None
+    def __init__(self,Userinf):
         self.conn = sqlite3.connect("loginDB.db")
         self.cursor = self.conn.cursor()
         self.main = CTk()
@@ -109,7 +111,7 @@ class sendmail:
                 #     encrypted_file.write(encrypt_data)
 
                 
-        
+
 
 
 if __name__ == "__main__":

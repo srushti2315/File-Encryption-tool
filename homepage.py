@@ -2,6 +2,7 @@ import customtkinter
 from customtkinter import *
 from PIL import Image
 import sender
+import inbox
 
 class homepage:
     userinf=None
@@ -51,6 +52,10 @@ class homepage:
     def sendmail(self):
         self.main.destroy()
         sender.sendmail(self.userinf)
+    def inbox(self):
+        self.main.destroy()
+        inbox.InboxApp(self.userinf)
+
 
 
 
