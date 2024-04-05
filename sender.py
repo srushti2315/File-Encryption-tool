@@ -1,13 +1,29 @@
 import customtkinter
 from customtkinter import *
+from tkinter import *
+from tkinter import filedialog, messagebox, Menu
 from PIL import Image
-
+from cryptography import fernet
+from cryptography.fernet import Fernet
+import sqlite3
+from cryptography.fernet import InvalidToken
+import sqlite3
+import os
 class sendmail:
-    def __init__(self):
+
+    file_path=None
+    file_data=None
+    userinf=None
+    def __init__(self,Userinf="om"):
+        self.conn = sqlite3.connect("loginDB.db")
+        self.cursor = self.conn.cursor()
         self.main = CTk()
         self.main.title("Home Page")
         self.main.config(bg="white")
-        
+        self.userinf=Userinf
+        self.key = Fernet.generate_key()
+        self.fernet = Fernet(self.key)
+
         screen_width = self.main.winfo_screenwidth()
         screen_height = self.main.winfo_screenheight()
 
@@ -41,10 +57,10 @@ class sendmail:
         self.subject_entry.grid(row=1, column=1, sticky="ew", padx=10, pady=5)
         self.message_text = CTkTextbox(self.email_frame, height=530, width=300)
         self.message_text.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
-        self.send_button = CTkButton(self.email_frame, text="Send",font=("", 17, "bold"),height=40,width=280)
+        self.send_button = CTkButton(self.email_frame, text="Send",font=("", 17, "bold"),height=40,width=280,command=self.send_file)
         self.send_button.grid(row=3, column=1, pady=10)
         self.send_button.place(relx=0.55,rely=0.91)
-        self.attachment_button = CTkButton(self.email_frame, text="Attachment",font=("", 17, "bold"),height=40,width=280)
+        self.attachment_button = CTkButton(self.email_frame, text="Attachment",font=("", 17, "bold"),height=40,width=280,command=self.choose_file)
         self.attachment_button.grid(row=3,column=1,pady=10)
         self.attachment_button.place(relx=0.15, rely=0.91)
         self.blank_label = CTkLabel(self.email_frame, text="")
@@ -56,6 +72,45 @@ class sendmail:
         x = (self.main.winfo_reqwidth() - 200) 
         y = (self.main.winfo_reqheight() - 200) 
         self.main.geometry(f"+{x}+{y}")
+    def choose_file(self):
+        self.file_path = filedialog.askopenfilename()
+        if self.file_path:
+            messagebox.showinfo("Success", "File selected successfully!")
+    
+    def send_file(self):
+        sendersname=self.recipient_entry.get()
+        subject=self.subject_entry.get()
+        text=self.message_text.get(0.0,'end')
+        self.enc,self.attachent_name=self.encrypt_file()
+        self.cursor.execute('''INSERT INTO {}
+                           (senders_name, subject, message,attachment_name,attachment)
+                           VALUES (?, ?, ?, ?. ?)'''.format(self.userinf), 
+                           (sendersname, subject, text,self.attachent_name,self.enc))
+        self.conn.commit()
+
+
+    def encrypt_file(self):
+        if hasattr(self, 'file_path'):
+            with open(self.file_path, 'rb') as file:
+                file_data = file.read()
+                encrypt_data = self.fernet.encrypt(file_data)
+
+                file_name = self.file_path.split('/')[-1]
+                encrypted_file_name = file_name + '.encrypted'
+            
+                return encrypt_data,encrypted_file_name
+        
+                # encrypted_files_dir = 'encrypted_files'
+                # if not os.path.exists(encrypted_files_dir):
+                #     os.makedirs(encrypted_files_dir)
+
+                # encrypted_file_path = os.path.join(encrypted_files_dir, encrypted_file_name)
+                # with open(encrypted_file_path, 'wb') as encrypted_file:
+                #     encrypted_file.write(encrypt_data)
+
+                
+        
+
 
 if __name__ == "__main__":
     sendmail()

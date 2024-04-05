@@ -49,8 +49,8 @@ class LoginPage:
         if user:
             messagebox.showinfo("Success", "Login successful!")
             self.main.destroy()
-            homepage.homepage()
-
+            homepage.homepage(username)
+   
         else:
             messagebox.showerror("Error", "Invalid username or password.")
     
@@ -117,10 +117,23 @@ class SignUpPage:
             messagebox.showerror("Error", "Passwords do not match.")
             return
      
-        self.cursor.execute("INSERT INTO login_users (username, password) VALUES (?, ?)", (username, password))
-        self.conn.commit()
+        self.cursor.execute("SELECT 1 FROM login_users WHERE username = ?", (username,))
+        existing_user = self.cursor.fetchone()
 
-        messagebox.showinfo("Success", "Signup successful!")
+        if existing_user:
+         messagebox.showerror("Error", "Username already exists!")
+        else:
+         self.cursor.execute("INSERT INTO login_users (username, password) VALUES (?, ?)", (username, password))
+         self.conn.commit()
+         messagebox.showinfo("Success", "User registered successfully!")
+         self.cursor.execute('''CREATE TABLE IF NOT EXISTS {}
+                               (id INTEGER PRIMARY KEY,
+                               senders_name TEXT,
+                               subject TEXT,
+                               message TEXT,,
+                               attachment_name TEXT
+                               attachment BLOB)'''.format(username))
+        self.conn.commit()
         self.root.destroy()
         LoginPage()
         
@@ -129,17 +142,7 @@ class SignUpPage:
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS login_users
                                (username TEXT,
                                password TEXT)''')
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                               (id INTEGER PRIMARY KEY,
-                               sender_name TEXT,
-                               messages BLOB)''')
-
-        
         self.conn.commit()
-
-    
-
-
 
 if __name__ == "__main__":
     LoginPage()

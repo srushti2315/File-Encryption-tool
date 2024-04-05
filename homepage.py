@@ -4,10 +4,12 @@ from PIL import Image
 import sender
 
 class homepage:
-    def __init__(self):
+    userinf=None
+    def __init__(self,userinf):
         self.main = CTk()
         self.main.title("Home Page")
         self.main.config(bg="white")
+        self.userinf=userinf
         
         screen_width = self.main.winfo_screenwidth()
         screen_height = self.main.winfo_screenheight()
@@ -48,7 +50,7 @@ class homepage:
     
     def sendmail(self):
         self.main.destroy()
-        sender.sendmail()
+        sender.sendmail(self.userinf)
 
 
 
