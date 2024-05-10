@@ -10,7 +10,7 @@ from cryptography.fernet import InvalidToken
 import sqlite3
 import os
 import inbox
-
+import homepage
 class sendmail:
 
     file_path=None
@@ -36,7 +36,7 @@ class sendmail:
         self.navbar = CTkFrame(self.main, height=50, fg_color="#121212")
         self.navbar.grid(row=0, column=0, sticky="ew")
 
-        self.home_btn = CTkButton(self.navbar, text="Home", fg_color="black",height=40,border_width=2,border_color="#39FF14",font=("", 15, "bold"),hover_color="green")
+        self.home_btn = CTkButton(self.navbar, text="Home", fg_color="black",height=40,border_width=2,border_color="#39FF14",font=("", 15, "bold"),hover_color="green",command=self.home)
         self.home_btn.place(relx=0.5, rely=0.5, anchor="center")
         self.about_btn = CTkButton(self.navbar, text="About", fg_color="black",height=40,border_width=2,border_color="#39FF14",font=("", 15, "bold"),hover_color="green")
         self.about_btn.place(relx=0.4, rely=0.5, anchor="center")
@@ -78,6 +78,9 @@ class sendmail:
         self.file_path = filedialog.askopenfilename()
         if self.file_path:
             messagebox.showinfo("Success", "File selected successfully!")
+    def home(self):
+         self.main.destroy
+         homepage.homepage(self.userinf)
     
     def send_file(self):
         sendersname=self.recipient_entry.get()

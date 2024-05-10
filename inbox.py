@@ -18,11 +18,13 @@ import sqlite3
 from cryptography.fernet import InvalidToken
 import sqlite3
 import os
-import inbox
+import homepage
+import login
+
 
 
 class InboxApp:
-    def __init__(self, userinf="om"):
+    def __init__(self, userinf):
         self.main = CTk()
         self.main.title("Home Page")
         self.main.config(bg="white")
@@ -41,7 +43,7 @@ class InboxApp:
         self.navbar = CTkFrame(self.main, height=50, fg_color="#121212", width=1600, border_width=2, border_color="purple")
         self.navbar.grid(row=0, columnspan=10, sticky="ew")
 
-        self.home_btn = CTkButton(self.navbar, text="Home", fg_color="black", height=40, border_width=2, border_color="#39FF14", font=("", 15, "bold"), hover_color="green")
+        self.home_btn = CTkButton(self.navbar, text="Home", fg_color="black", height=40, border_width=2, border_color="#39FF14", font=("", 15, "bold"), hover_color="green",command=self.home)
         self.home_btn.place(relx=0.5, rely=0.5, anchor="center")
         self.about_btn = CTkButton(self.navbar, text="About", fg_color="black", height=40, border_width=2, border_color="#39FF14", font=("", 15, "bold"), hover_color="green")
         self.about_btn.place(relx=0.4, rely=0.5, anchor="center")
@@ -63,13 +65,12 @@ class InboxApp:
             sender, subject, mes, attachment_name,attachment,key = message
             self.message_but[a] = CTkButton(self.inbox_frame, text=f"{index}. From: {sender}, Subject: {subject}", height=50, width=300, fg_color="black")
             self.message_but[a].grid(row=a, column=0, sticky="n")
-            self.message_but[a].bind("<Button-1>", lambda event, msg=mes, attach=attachment, attach_name=attachment_name,key=key: self.message_frame(msg, attach, attach_name,key))
+            self.message_but[a].bind("<Button-1>", lambda event,sender=sender, msg=mes, attach=attachment, attach_name=attachment_name,key=key,subject=subject: self.message_frame(sender,subject,msg, attach, attach_name,key))
 
             a += 1
 
     def decrypt_attachment(self, attachment, attachment_name,key):
         encrypted_files_dir = 'encrypted_files'
-        print(attachment)
         if not os.path.exists(encrypted_files_dir):
             os.makedirs(encrypted_files_dir)
 
@@ -81,7 +82,10 @@ class InboxApp:
 
 
 
-
+    def home(self):
+         self.main.destroy
+         homepage.homepage(self.userinf)
+         
 
     def decrypt_file(self,encryptedfilepath2,key):
 
@@ -114,21 +118,25 @@ class InboxApp:
                 
             
 
-    def message_frame(self, message, attachment,attachment_name,key):
+    def message_frame(self,sender,subject, message, attachment,attachment_name,key):
     
         message_frame = CTkFrame(self.main, fg_color="black", border_width=2, border_color="black")
         message_frame.grid(row=2, column=1, sticky="nsew")
         self.main.grid_rowconfigure(2, weight=200)
         self.main.grid_columnconfigure(1, weight=200)
     
-        message_label = CTkLabel(message_frame, text=message, font=("", 20))
+        message_label = CTkLabel(message_frame, text="Sender's name : "+sender, font=("", 20))
         message_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        message_label = CTkLabel(message_frame, text="Subject :"+subject, font=("", 20))
+        message_label.grid(row=1, column=0, sticky="w", padx=10, pady=10)
     
         if attachment:
             attachment_label = CTkLabel(message_frame, text=f"Attachment: {attachment_name}", font=("", 20))
-            attachment_label.grid(row=1, column=0, sticky="w", padx=10, pady=10)
+            attachment_label.grid(row=3, column=0, sticky="w", padx=10, pady=10)
             decrypt_button = CTkButton(message_frame, text="Decrypt", command=lambda: self.decrypt_attachment(attachment,attachment_name,key))
-            decrypt_button.grid(row=2, column=0, sticky="w", padx=10, pady=10)
+            decrypt_button.grid(row=4, column=0, sticky="w", padx=10, pady=10)
+        message_label = CTkLabel(message_frame, text="Message :"+message, font=("", 20))
+        message_label.grid(row=5, column=0, sticky="w", padx=10, pady=10)
 
     def center_window(self):
         x = (self.main.winfo_reqwidth() - 200) 
@@ -136,5 +144,5 @@ class InboxApp:
         self.main.geometry(f"+{x}+{y}")
 
 if __name__ == "__main__":
-    userinf = "om" 
+    userinf="om"
     app = InboxApp(userinf)

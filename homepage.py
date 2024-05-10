@@ -4,9 +4,10 @@ from PIL import Image
 import sender
 import inbox
 
+
 class homepage:
     userinf=None
-    def __init__(self,userinf):
+    def __init__(self,userinf="om"):
         self.main = CTk()
         self.main.title("Home Page")
         self.main.config(bg="white")
@@ -40,7 +41,7 @@ class homepage:
         self.tab.place(x=tab_x, y=tab_y)
         self.send_mail_btn = CTkButton(self.tab, text="SEND \nMESSAGE", width=280,height=80,border_width=4,border_color="purple",font=("Times New Roman", 25, "bold"),hover_color="#007C7A",fg_color="black",command=self.sendmail)
         self.send_mail_btn.place(relx=0.3, rely=0.5, anchor="center")
-        self.Inbox_btn = CTkButton(self.tab, text="INBOX", fg_color="black",width=280,height=80,border_width=4,border_color="purple",font=("Times New Roman", 25, "bold"),hover_color="#007C7A")
+        self.Inbox_btn = CTkButton(self.tab, text="INBOX", fg_color="black",width=280,height=80,border_width=4,border_color="purple",font=("Times New Roman", 25, "bold"),hover_color="#007C7A",command=self.inbox)
         self.Inbox_btn.place(relx=0.7, rely=0.5, anchor="center")
         self.main.mainloop()
 
@@ -55,9 +56,7 @@ class homepage:
     def inbox(self):
         self.main.destroy()
         inbox.InboxApp(self.userinf)
-
-
-
+    
 
 if __name__ == "__main__":
     homepage()
