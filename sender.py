@@ -79,7 +79,7 @@ class sendmail:
         if self.file_path:
             messagebox.showinfo("Success", "File selected successfully!")
     def home(self):
-         self.main.destroy
+         self.main.destroy()
          homepage.homepage(self.userinf)
     
     def send_file(self):
@@ -92,6 +92,7 @@ class sendmail:
                            VALUES (?, ?, ?, ?, ?, ?)'''.format(sendersname), 
                            (self.userinf, subject,text,self.attachent_name,self.enc,self.key))
         self.conn.commit()
+        messagebox.showinfo("Success", "Message sent successfully!")
 
 
     def encrypt_file(self):

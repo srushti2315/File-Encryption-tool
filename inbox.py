@@ -83,7 +83,7 @@ class InboxApp:
 
 
     def home(self):
-         self.main.destroy
+         self.main.destroy()
          homepage.homepage(self.userinf)
          
 

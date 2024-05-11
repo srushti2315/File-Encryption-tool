@@ -30,7 +30,7 @@ class homepage:
         self.contact_btn = CTkButton(self.navbar, text="Contact Us", fg_color="black",height=40,border_width=2,border_color="#39FF14",font=("", 15, "bold"),hover_color="green")
         self.contact_btn.place(relx=0.6, rely=0.5, anchor="center")
 
-        self.bg_img = CTkImage(dark_image=Image.open("assets/images/bg9.png"), size=(screen_width, screen_height))
+        self.bg_img = CTkImage(dark_image=Image.open("assets/images/mainbg.jpg"), size=(screen_width, screen_height))
         self.bg_lab = CTkLabel(self.main, image=self.bg_img, text="")
         self.bg_lab.grid(row=1, column=0)
         tab_width = 800
